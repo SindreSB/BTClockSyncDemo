@@ -181,16 +181,20 @@ public class MainActivity extends AppCompatActivity {
      * Establish connection with other device
      *
      * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    private void connectDevice(Intent data, boolean secure) {
+    private void connectDevice(Intent data) {
         // Get the device MAC address
         String address = data.getExtras()
                 .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+
+        startConnection(address);
+    }
+
+    private void startConnection(String address) {
         // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        mChatService.connect(device, secure);
+        mChatService.connect(device);
     }
 
     long request_time;
@@ -271,13 +275,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CONNECT_DEVICE_SECURE:
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
-                    connectDevice(data, true);
-                }
-                break;
-            case REQUEST_CONNECT_DEVICE_INSECURE:
-                // When DeviceListActivity returns with a device to connect
-                if (resultCode == Activity.RESULT_OK) {
-                    //connectDevice(data, false);
+                    connectDevice(data);
                 }
                 break;
             case REQUEST_ENABLE_BT:
