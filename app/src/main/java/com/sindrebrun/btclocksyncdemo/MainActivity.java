@@ -212,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         sync_count++;
     }
 
+
     private void replyToTimeRequest() {
         long response_time = System.currentTimeMillis();
         mChatService.write(("time:" + Long.toString(response_time)).getBytes());
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         logLines.add(sync_count + "," + request_time + "," + current_time + "," + response);
         //mDelayTextView.setText(Long.toString(deviance));
     }
+
 
     private void handleIncomingMessage(String message){
         if (message.equalsIgnoreCase("get_time")) {
@@ -250,21 +252,15 @@ public class MainActivity extends AppCompatActivity {
     private void calculateAverage() {
         syncInProgress = false;
         double average = 0;
-
+        long mean = 0;
         Collections.sort(delays);
-        delays = delays.subList(10,90);
 
-        Long sum = 0L;
-        for(Long e: delays){
-            sum += e;
-        }
+        average = Utils.average(delays.subList(20,80));
+        mean = Utils.mode(delays.toArray(new Long[0]));
 
-        average = (double)sum / (double)delays.size();
-
-        //writeSyncLogToFile();
-
-        mDelayTextView.setText("After " + Integer.toString(sync_count) + "syncs, the average delay is " + Double.toString(average));
+        mDelayTextView.setText("Average: " + Double.toString(average) + "; Mode: " + Long.toString(mean));
     }
+
 
     private boolean isTimeResponse(String message) {
         return message.substring(0, 4).equalsIgnoreCase("time");
@@ -302,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The Handler that gets information back from the BluetoothChatService
      */
-    private final Handler mHandler = new Handler() {
+    private final Handler mHandler = new BluetoothSPPHandler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
